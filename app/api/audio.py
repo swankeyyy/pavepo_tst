@@ -1,31 +1,47 @@
-import uuid
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
-from fastapi.responses import JSONResponse
-import os
+from fastapi import APIRouter, Depends, UploadFile, File, status
+
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from schemas.audio import AudioCreateSchema
+from services.audio import AudioService
+from src.db.db_config import db_config
 
 # Initialize router
 router = APIRouter()
 
 
-@router.post("/upload")
+@router.post(
+    "/upload",
+    summary="Upload an audio file and save it to the server, returning the file path",
+    responses={
+        status.HTTP_200_OK: {
+            "description": "File uploaded successfully",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "path": "/path/to/file",
+                        "name": "example.mp3",
+                    }
+                }
+            },
+        },
+        status.HTTP_400_BAD_REQUEST: {"description": "Unsupported file format"},
+        status.HTTP_500_INTERNAL_SERVER_ERROR: {"description": "Internal server error"},
+    },
+    response_model=AudioCreateSchema,
+)
 async def upload_audio(
     name: str,
     file: UploadFile = File(...),
+    session: AsyncSession = Depends(db_config.get_session),
 ):
-    # Check if the file is an audio file
-    if not file.filename.lower().endswith((".mp3", ".wav", ".ogg", ".flac")):
-        raise HTTPException(status_code=400, detail="Unsupported file format")
+    """
+    Uploads an audio file and saves it to the server with a unique filename.
 
-    # Create the directory if it doesn't exist
-    os.makedirs("app/static/audio", exist_ok=True)
+    - **file**: Audio file to upload (supported formats: .mp3, .wav, .ogg, .flac)
+    - **returns**: JSON with saved file path
+    """
 
-    # Generate a unique file name
-    ext = os.path.splitext(file.filename)[1]
-    filename = f"{uuid.uuid4()}{ext}"
-    file_path = os.path.join("app/static/audio", filename)
-
-    # Save file to the server
-    with open(file_path, "wb") as buffer:
-        buffer.write(await file.read())
-
-    
+    result = await AudioService.saveaudio(file=file, name=name, session=session)
+    return result
