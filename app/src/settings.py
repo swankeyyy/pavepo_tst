@@ -1,6 +1,6 @@
 class Settings:
     # Database settings
-    DB_URL: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/postgres"
+    DB_URL: str = "postgresql+asyncpg://postgres:postgres@db:5432/postgres"
     DB_ECHO: bool = True
 
     # Server settings
