@@ -18,7 +18,12 @@ router = APIRouter()
         status.HTTP_200_OK: {
             "description": "File uploaded successfully",
             "content": {
-                "application/json": {"example": {"file_path": "app/static/example.mp3"}}
+                "application/json": {
+                    "example": {
+                        "path": "/path/to/file",
+                        "name": "example.mp3",
+                    }
+                }
             },
         },
         status.HTTP_400_BAD_REQUEST: {"description": "Unsupported file format"},
