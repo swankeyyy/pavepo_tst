@@ -1,6 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 
+from api import router as api_router
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -15,6 +16,8 @@ app = FastAPI(
     redoc_url=None,
 )
 
+# Import and include routers
+app.include_router(api_router)
 
 # Run the app with uvicorn server
 if __name__ == "__main__":
