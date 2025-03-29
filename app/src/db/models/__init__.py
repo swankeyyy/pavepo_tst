@@ -1,3 +1,4 @@
-__all__ = ("Base")
+__all__ = ("Base", "AudioFile")
 
 from .base import Base
+from .audio import AudioFile

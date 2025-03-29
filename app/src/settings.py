@@ -6,6 +6,9 @@ class Settings:
     # Server settings
     URL: str = "127.0.0.1:8000"
     API_PREFIX: str = "/api"
+    
+    # Static files settings
+    STATIC_DIR: str = "static/"
 
 
 # Create an instance of the Settings class
