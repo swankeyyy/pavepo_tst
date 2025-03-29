@@ -2,9 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
 
 
-
-from services.auth.yandex_auth import get_yandex_access_token, get_yandex_user_info
+from services.user import user_service
 from src.settings import settings
+from src.db.db_config import db_config
+from sqlalchemy.ext.asyncio import AsyncSession
 
 # Initialize router
 router = APIRouter()
@@ -40,31 +41,31 @@ async def login_via_yandex():
     "/yandex/callback",
     summary="Get the code from Yandex OAuth callback URL and register the user in the system. If not works at swagger need copy code from URL",
     responses={
-        status.HTTP_200_OK: {
-            "description": "Yandex user info",
-            "content": {
-                "application/json": {
-                    "example": {
-                        "id": 123456789,
-                        "login": "example_login",
-                        "first_name": "John",
-                        "last_name": "Doe",
-                        "default_avatar_id": 123456789,
-                    }
-                }
-            },
+        status.HTTP_201_CREATED: {
+            "description": "User successfully registered",
+            "content": {"application/json": {"example": {"access_token": "string"}}},
         },
         status.HTTP_400_BAD_REQUEST: {
             "description": "Missing code parameter in callback URL",
-            "content": {"application/json": {"example": {"detail": "Missing code parameter in callback URL"}}},
+            "content": {
+                "application/json": {
+                    "example": {"detail": "Missing code parameter in callback URL"}
+                }
+            },
         },
         status.HTTP_401_UNAUTHORIZED: {
             "description": "Invalid Yandex access token",
-            "content": {"application/json": {"example": {"detail": "Invalid Yandex access token"}}},
+            "content": {
+                "application/json": {
+                    "example": {"detail": "Invalid Yandex access token"}
+                }
+            },
         },
     },
 )
-async def yandex_callback(code: str):
+async def yandex_callback(
+    code: str, session: AsyncSession = Depends(db_config.get_session)
+):
     """Get the code from Yandex OAuth callback URL and register the user in the system."""
     if not code:
         raise HTTPException(
@@ -72,10 +73,12 @@ async def yandex_callback(code: str):
             detail="Missing code parameter in callback URL",
         )
 
-    # Get the access token from Yandex
-    access_token = await get_yandex_access_token(code)
-
-    # Get user info from Yandex using the access token
-    user_info = await get_yandex_user_info(access_token)
-
-    return user_info
+    try: 
+        #Get token from service
+        token = await user_service.create_access_token(code=code, session=session)
+        return {"access_token": token}
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Yandex access token",
+        )

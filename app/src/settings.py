@@ -14,6 +14,11 @@ class Settings:
     YANDEX_CLIENT_ID: str = "603fcc97e1544065beaeeaaeb9af1f4a"
     YANDEX_CLIENT_SECRET: str = "36c3ea40e34e40bea2adc66113f0cd8f"
     YANDEX_REDIRECT_URL: str = "http://localhost:8000/auth/yandex/callback"
+    
+    # JWT settings
+    ALGHORITHM: str = "HS256"
+    SECRET_KEY: str = "default"
+    ACCESS_TOKEN_EXPIRE: int = 60 * 24 * 7  # 7 days
 
 # Create an instance of the Settings class
 settings = Settings()
