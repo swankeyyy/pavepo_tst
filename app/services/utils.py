@@ -6,16 +6,17 @@ from fastapi import HTTPException
 from src.settings import settings
 
 # Directory to save uploaded files
-UPLOAD_DIR = settings.STATIC_DIR
+DIR = settings.STATIC_DIR
 
 
-async def get_filepath(file) -> str | None:
+async def get_filepath(user_id: str, file) -> str | None:
     # Check if the file is an audio file
     if not file.filename.lower().endswith((".mp3", ".wav", ".ogg", ".flac")):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported file format"
         )
-
+    # Make upload dir for current user
+    UPLOAD_DIR = DIR + user_id + "/"
     # Create the directory if it doesn't exist
     os.makedirs(UPLOAD_DIR, exist_ok=True)
 

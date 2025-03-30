@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from schemas.audio import AudioCreateSchema
 from services.audio import audio_service
 from src.db.db_config import db_config
+from services.dependencies.user_dependency import get_user_dependency
 
 # Initialize router
 router = APIRouter()
@@ -33,6 +34,7 @@ router = APIRouter()
 )
 async def upload_audio(
     name: str,
+    user: dict = Depends(get_user_dependency),
     file: UploadFile = File(...),
     session: AsyncSession = Depends(db_config.get_session),
 ):
@@ -43,5 +45,5 @@ async def upload_audio(
     - **returns**: JSON with saved file path
     """
 
-    result = await audio_service.saveaudio(file=file, name=name, session=session)
+    result = await audio_service.saveaudio(user=user, file=file, name=name, session=session)
     return result

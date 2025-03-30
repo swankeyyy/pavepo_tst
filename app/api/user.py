@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.db.db_config import db_config
 from services.user import user_service
 from schemas.user import UserReadSchema, UserUpdateSchema
+from services.dependencies.user_dependency import get_user_dependency
 
 # Init router
 router = APIRouter()
@@ -22,7 +23,7 @@ router = APIRouter()
     },
 )
 async def get_user(
-    user: dict = Depends(user_service.get_user_dependency),
+    user: dict = Depends(get_user_dependency),
     session: AsyncSession = Depends(db_config.get_session),
 ):
     """Get current user info by access token.
@@ -38,7 +39,7 @@ async def get_user(
 })
 async def update_user(
     update_data: UserUpdateSchema,
-    user: dict = Depends(user_service.get_user_dependency),
+    user: dict = Depends(get_user_dependency),
     session: AsyncSession = Depends(db_config.get_session),
 ):
     """
@@ -53,7 +54,7 @@ async def update_user(
 @router.delete("/user_id")
 async def delete_user(
     user_id: str,
-    user: dict = Depends(user_service.get_user_dependency),
+    user: dict = Depends(get_user_dependency),
     session: AsyncSession = Depends(db_config.get_session),
 ):
     """
