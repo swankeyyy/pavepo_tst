@@ -48,3 +48,16 @@ async def update_user(
         user=user, update_data=update_data, session=session
     )
     return user
+
+
+@router.delete("/user_id")
+async def delete_user(
+    user_id: str,
+    user: dict = Depends(user_service.get_user_dependency),
+    session: AsyncSession = Depends(db_config.get_session),
+):
+    """
+        Delete user by access token.
+    """
+    await user_service.delete_user(user_id=user_id, user=user, session=session)
+    return {"message": "User deleted successfully"}

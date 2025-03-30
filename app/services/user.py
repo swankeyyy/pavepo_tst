@@ -58,7 +58,7 @@ class UserService:
         )
 
         # Create the token payload
-        to_encode = {"user_id": str(user.id), "is_superuser": str(user.is_superuser)}
+        to_encode = {"user_id": str(user.id), "is_superuser": user.is_superuser}
         access_token = create_access_token(data=to_encode, expires_delta=expires_delta)
 
         # Return the access token
@@ -122,6 +122,27 @@ class UserService:
 
         return user
 
+    async def delete_user(self, user_id: str, user: dict, session: AsyncSession) -> None:
+        """Delete user by ID, only for superuser."""
+        
+        # Check if the user is a superuser
+        if not user.get("is_superuser"):
+            raise HTTPException(status_code=403, detail="Not enough permissions")
+
+        # Get the user by ID
+        stmt = select(User).where(User.id == user_id)
+        user = await session.execute(stmt)
+        user = user.scalars().first()
+
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Delete the user
+        await session.delete(user)
+        await session.commit()
+        
+        return {"detail": "User deleted successfully"}
+        
 
 # Initialize the UserService
 user_service = UserService()
