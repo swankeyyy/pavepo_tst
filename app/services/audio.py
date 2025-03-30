@@ -7,8 +7,8 @@ class AudioService:
     """
     Service class for handling audio file operations."""
 
-    @staticmethod
-    async def saveaudio(file, name: str, session: AsyncSession) -> AudioFile:
+    
+    async def saveaudio(self, file, name: str, session: AsyncSession) -> AudioFile:
         # Save the file to disk and get the file path
         file_path = await get_filepath(file)
         
@@ -21,3 +21,6 @@ class AudioService:
         # Return the saved audio object
         return audio
     
+
+# Initialize the audio service
+audio_service = AudioService()

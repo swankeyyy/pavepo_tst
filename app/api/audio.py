@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, UploadFile, File, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from schemas.audio import AudioCreateSchema
-from services.audio import AudioService
+from services.audio import audio_service
 from src.db.db_config import db_config
 
 # Initialize router
@@ -43,5 +43,5 @@ async def upload_audio(
     - **returns**: JSON with saved file path
     """
 
-    result = await AudioService.saveaudio(file=file, name=name, session=session)
+    result = await audio_service.saveaudio(file=file, name=name, session=session)
     return result

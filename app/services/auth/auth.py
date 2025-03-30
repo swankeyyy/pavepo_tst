@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
+from fastapi import HTTPException
 from jose import JWTError, jwt
 
 
@@ -23,5 +24,13 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     # Return the encoded JWT token
     return encoded_jwt
 
-
-
+async def get_user_from_token(token: str):
+    """Get user from token. Decode the JWT token and return the user data."""
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGHORITHM]
+        )
+        data = payload.copy()
+        return data
+    except jwt.JWTError:
+        raise HTTPException(status_code=400, detail="Token is invalid")
