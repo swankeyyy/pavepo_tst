@@ -1,7 +1,7 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 
 from fastapi import HTTPException
-from jose import JWTError, jwt
+from jose import jwt
 
 
 from src.settings import settings

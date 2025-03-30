@@ -1,10 +1,10 @@
-from fastapi import HTTPException, Header
+from fastapi import HTTPException
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from services.auth.yandex_auth import get_yandex_access_token, get_yandex_user_info
-from services.auth.auth import create_access_token, get_user_from_token
+from services.auth.auth import create_access_token
 from src.db.models import User
 from src.settings import settings
 
@@ -64,19 +64,6 @@ class UserService:
         # Return the access token
         return access_token
 
-    async def get_user_dependency(
-        self, token: str = Header(alias="access_token")
-    ) -> dict:
-        """
-        This function is a placeholder for the actual implementation of getting the current user.
-        In a real application, this would typically involve decoding a JWT token.
-        """
-
-        # Decode the token and get user data
-        user = await get_user_from_token(token)
-
-        return user
-
     async def get_user(self, user: dict, session: AsyncSession) -> User:
         """
         Get user by ID.
@@ -108,10 +95,10 @@ class UserService:
         user = user.scalars().first()
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
-        
+
         # Convert update_data to a dictionary
         update_dict = update_data.dict(exclude_unset=True)
-        
+
         # Update user info
         for key, value in update_dict.items():
             setattr(user, key, value)
@@ -122,9 +109,11 @@ class UserService:
 
         return user
 
-    async def delete_user(self, user_id: str, user: dict, session: AsyncSession) -> None:
+    async def delete_user(
+        self, user_id: str, user: dict, session: AsyncSession
+    ) -> None:
         """Delete user by ID, only for superuser."""
-        
+
         # Check if the user is a superuser
         if not user.get("is_superuser"):
             raise HTTPException(status_code=403, detail="Not enough permissions")
@@ -140,9 +129,9 @@ class UserService:
         # Delete the user
         await session.delete(user)
         await session.commit()
-        
+
         return {"detail": "User deleted successfully"}
-        
+
 
 # Initialize the UserService
 user_service = UserService()

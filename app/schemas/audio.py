@@ -8,3 +8,10 @@ class AudioCreateSchema(BaseSchema):
     """
     path: str
     name: str
+    
+class AudioReadSchema(BaseSchema):
+    """Schema for list of audio files for currentuser"""
+    id: UUID
+    name: str
+    path: str
+    user_id: UUID
