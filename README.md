@@ -15,7 +15,8 @@ git clone https://github.com/swankeyyy/pavepo_tst.git
 
 ### 2. Запустите проект
 ```bash
-docker-compose up -d --build
+docker-compose build
+docker-compose up
 ```
 
 ### 3. Откройте проект
