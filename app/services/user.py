@@ -1,10 +1,10 @@
-from fastapi import HTTPException, Header
+from fastapi import HTTPException
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from services.auth.yandex_auth import get_yandex_access_token, get_yandex_user_info
-from services.auth.auth import create_access_token, get_user_from_token
+from services.auth.auth import create_access_token
 from src.db.models import User
 from src.settings import settings
 

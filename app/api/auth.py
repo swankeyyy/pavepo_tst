@@ -82,3 +82,4 @@ async def yandex_callback(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid Yandex access token",
         )
+
