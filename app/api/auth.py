@@ -86,7 +86,7 @@ async def yandex_callback(
 
 
 @router.post(
-    "refresh",
+    "/refresh",
     summary="Refresh users token",
     responses={status.HTTP_201_CREATED: {"description": "token succesfully created"}},
 )
