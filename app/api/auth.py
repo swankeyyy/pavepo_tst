@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import RedirectResponse
 
-
 from services.user import user_service
+from services.dependencies.user_dependency import get_user_dependency
+from services.auth.auth import create_access_token
 from src.settings import settings
 from src.db.db_config import db_config
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -73,8 +74,8 @@ async def yandex_callback(
             detail="Missing code parameter in callback URL",
         )
 
-    try: 
-        #Get token from service
+    try:
+        # Get token from service
         token = await user_service.create_access_token(code=code, session=session)
         return {"access_token": token}
     except Exception as e:
@@ -83,3 +84,13 @@ async def yandex_callback(
             detail="Invalid Yandex access token",
         )
 
+
+@router.post(
+    "refresh",
+    summary="Refresh users token",
+    responses={status.HTTP_201_CREATED: {"description": "token succesfully created"}},
+)
+async def refresh(user: dict = Depends(get_user_dependency)):
+    """Takes users info from token and return new token"""
+    token = create_access_token(user)
+    return {"access_token": token}
